@@ -29,6 +29,11 @@ app.get("/", (req, res) => {
   res.json({ message: "hello from StorageApp" });
 });
 
+app.get("/err", (req, res) => {
+  console.log("process exited with error");
+  process.exit(1);
+});
+
 app.use("/directory", checkAuth, directoryRoutes);
 app.use("/file", checkAuth, fileRoutes);
 app.use("/", userRoutes);
