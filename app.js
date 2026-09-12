@@ -25,6 +25,9 @@ app.use(
     credentials: true,
   }),
 );
+app.get("/", (req, res) => {
+  res.json({ message: "hello from StorageApp" });
+});
 
 app.use("/directory", checkAuth, directoryRoutes);
 app.use("/file", checkAuth, fileRoutes);
