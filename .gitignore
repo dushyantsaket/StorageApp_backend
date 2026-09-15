@@ -1,2 +1,3 @@
 node_modules
 .envcloudfront-private-key.pem
+.env
