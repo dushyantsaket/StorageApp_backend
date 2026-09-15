@@ -25,9 +25,12 @@
 // // https://bibwild.wordpress.com/2024/06/18/cloudfront-in-front-of-s3-using-response-content-disposition/
 
 import { getSignedUrl } from "@aws-sdk/cloudfront-signer"; // ESM
-import { readFile } from "fs/promises";
+import { readFileSync } from "fs";
 
-const privateKey = process.env.CLOUDFRONT_PRIVATEKEY;
+const privateKey = readFileSync(
+  "/home/ubuntu/StorageApp_backend/cloudfront-private-key.pem",
+  "utf8"
+);
 const keyPairId = "E1TJLBT5D75IF3";
 // const dateLessThan = "2026-09-02"; // any Date constructor compatible
 const dateLessThan = new Date(Date.now() + 1000 * 60 * 60).toISOString();
