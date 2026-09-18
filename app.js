@@ -19,9 +19,16 @@ app.use(cookieParser(process.env.SESSION_SECRET));
 // route must receive the raw body before express.json() parses it.
 app.use("/webhooks", express.raw({ type: "application/json" }), webhookRoutes);
 app.use(express.json());
+const whitelist = [process.env.CLIENT_URL_1, process.env.CLIENT_URL_2];
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
