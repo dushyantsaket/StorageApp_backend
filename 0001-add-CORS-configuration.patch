@@ -1,0 +1,28 @@
+From 239b55d6a6d7c72fe1b160064f166b08be359d9d Mon Sep 17 00:00:00 2001
+From: Ubuntu <ubuntu@ip-172-31-20-148.ec2.internal>
+Date: Fri, 18 Sep 2026 12:03:21 +0000
+Subject: [PATCH] add CORS configuration
+
+---
+ cors.json | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+ create mode 100644 cors.json
+
+diff --git a/cors.json b/cors.json
+new file mode 100644
+index 0000000..e74f752
+--- /dev/null
++++ b/cors.json
+@@ -0,0 +1,9 @@
++[
++  {
++    "AllowedHeaders": ["*"],
++    "AllowedMethods": ["PUT", "GET", "HEAD"],
++    "AllowedOrigins": ["https://vpttoolsindia.store"],
++    "ExposeHeaders": ["ETag"],
++    "MaxAgeSeconds": 3000
++  }
++]
+-- 
+2.53.0
+
