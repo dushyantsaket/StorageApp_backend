@@ -44,8 +44,10 @@ app.use(
 );
 
 app.post("/github-webhook", (req, res) => {
+  console.log("");
   console.log("REQUEST HEADERS:", req.headers);
   console.log("REQUEST BODY:", req.body);
+  res.json({ message: "OK" });
   const bashChildProcess = spawn("bash", ["/home/ubuntu/depolye-fronted.sh"]);
 
   // bashChildProcess.stdout.pipe(process.stdout);
@@ -69,7 +71,6 @@ app.post("/github-webhook", (req, res) => {
     }
   });
   bashChildProcess.on("error", (err) => {
-    res.json({ message: "OK" });
     console.log("ERROR is  spawning the  process");
     console.log(err);
   });
