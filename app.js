@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -10,64 +9,9 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import checkAuth from "./middlewares/authMiddleware.js";
 import { connectDB } from "./config/db.js";
-await connectDB();
 
-const PORT = process.env.PORT || 4000;
+import { spawn } from "child_process";
 
-const app = express();
-app.use(cookieParser(process.env.SESSION_SECRET));
-// Razorpay's signature is calculated from the exact request bytes, so this
-// route must receive the raw body before express.json() parses it.
-app.use("/webhooks", express.raw({ type: "application/json" }), webhookRoutes);
-app.use(express.json());
-const whitelist = [process.env.CLIENT_URL_1, process.env.CLIENT_URL_2];
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  }),
-);
-app.get("/", (req, res) => {
-  res.json({ message: "hello from StorageApp" });
-});
-
-app.get("/err", (req, res) => {
-  console.log("process exited with error");
-  process.exit(1);
-});
-
-app.use("/directory", checkAuth, directoryRoutes);
-app.use("/file", checkAuth, fileRoutes);
-app.use("/", userRoutes);
-app.use("/auth", authRoutes);
-app.use("/subscription", subscriptionRoutes);
-
-app.use((err, req, res, next) => {
-  console.log(err);
-  res.status(err.status || 500).json({ error: "Something went wrong!" });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server Started`);
-});
-=======
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import directoryRoutes from "./routes/directoryRoutes.js";
-import fileRoutes from "./routes/fileRoutes.js";
-import { subscriptionRoutes } from "./routes/subscriptionRoutes.js";
-import webhookRoutes from "./routes/webhookRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
-import checkAuth from "./middlewares/authMiddleware.js";
-import { connectDB } from "./config/db.js";
 await connectDB();
 
 const PORT = process.env.PORT || 4000;
@@ -80,15 +24,15 @@ app.use("/webhooks", express.raw({ type: "application/json" }), webhookRoutes);
 app.use(express.json());
 const whitelist = [process.env.CLIENT_URL_1, process.env.CLIENT_URL_2];
 
-app.use((req ,res, next) => {
- console.log(req.headers)
-next()
+app.use((req, res, next) => {
+  console.log(req.headers);
+  next();
 });
 
 app.use(
   cors({
     origin: function (origin, callback) {
-         console.log(origin);
+      console.log(origin);
       if (whitelist.indexOf(origin) !== -1 || !origin) {
         callback(null, true);
       } else {
@@ -98,6 +42,41 @@ app.use(
     credentials: true,
   }),
 );
+
+app.post("/github-webhook", (req, res) => {
+  console.log("REQUEST HEADERS:", req.headers);
+  console.log("REQUEST BODY:", req.body);
+  const bashChildProcess = spawn("bash", ["/home/ubuntu/depolye-fronted.sh"]);
+
+  // bashChildProcess.stdout.pipe(process.stdout);
+  // bashChildProcess.stdout.pipe(process.stdout);
+
+  bashChildProcess.stdout.on("data", (data) => {
+    // console.log("got stander out data ");
+    process.stdout.write(data);
+  });
+
+  bashChildProcess.stderr.on("data", (data) => {
+    process.stderr.write(data);
+  });
+
+  bashChildProcess.on("close", (code) => {
+    res.json({ message: "OK" });
+    if (code === 0) {
+      console.log("script executed  successfully");
+    } else {
+      console.log("script faild");
+    }
+  });
+  bashChildProcess.on("error", (err) => {
+    res.json({ message: "OK" });
+    console.log("ERROR is  spawning the  process");
+    console.log(err);
+  });
+  // console.log(bashChildProcess.stdout);
+  // console.log(bashChildProcess.stderr);
+});
+
 app.get("/", (req, res) => {
   res.json({ message: "hello from StorageApp" });
 });
@@ -121,4 +100,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server Started`);
 });
->>>>>>> Stashed changes
