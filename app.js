@@ -44,6 +44,24 @@ app.use(
 );
 
 app.post("/github-webhook", (req, res) => {
+  const givenSignature = req.headers["X-Hub-Signature-256"];
+
+  if (!givenSignature) {
+    return res.status(403).json({ error: "Invalid Signature" });
+  }
+
+  const calculatedSignature =
+    "sha256=" +
+    crypto
+      .createHmac("sha256", "dushyan")
+      .update(JSON.stringify(payload))
+      .digest("hex");
+  crypto.timingSafeEqual;
+  if (givenSignature !== calculatedSignature) {
+    return res.status(403).json({ error: "Invalid Signature" });
+  }
+  console.log(calculatedSignature);
+
   console.log("");
   console.log("REQUEST HEADERS:", req.headers);
   console.log("REQUEST BODY:", req.body);
