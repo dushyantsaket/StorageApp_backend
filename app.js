@@ -86,7 +86,7 @@ app.post(
     res.json({ message: "OK" });
     let repository;
 
-    if (req.body.repository.name === "storageApp-fronted") {
+    if (payload.repository.name === "storageApp-fronted") {
       repository = "fronted";
     } else {
       repository = "backend";
@@ -97,7 +97,7 @@ app.post(
     ]);
     // const bashChildProcess = spawn("bash", ["/home/ubuntu/depolye-fronted.sh"]);
 
-    console.log("🔥 deploye-fronted.sh spawned");
+    console.log(`🔥 depolye-${repository}.sh spawned`);
     // bashChildProcess.stdout.pipe(process.stdout);
     // bashChildProcess.stdout.pipe(process.stdout);
 
@@ -127,7 +127,7 @@ app.post(
 );
 
 app.get("/", (req, res) => {
-  res.json({ message: "heeeloo from My StorageApp" });
+  res.json({ message: "hello from  StorageApp" });
 });
 
 app.get("/err", (req, res) => {
