@@ -1,3 +1,4 @@
+  GNU nano 8.7.1                                                                                                                                                                                                  app.js
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -9,9 +10,8 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import checkAuth from "./middlewares/authMiddleware.js";
 import { connectDB } from "./config/db.js";
-
 import { spawn } from "child_process";
-
+import crypto from "node:crypto";
 await connectDB();
 
 const PORT = process.env.PORT || 4000;
@@ -21,7 +21,7 @@ app.use(cookieParser(process.env.SESSION_SECRET));
 // Razorpay's signature is calculated from the exact request bytes, so this
 // route must receive the raw body before express.json() parses it.
 app.use("/webhooks", express.raw({ type: "application/json" }), webhookRoutes);
-app.use(express.json());
+//app.use(express.json());
 const whitelist = [process.env.CLIENT_URL_1, process.env.CLIENT_URL_2];
 
 app.use((req, res, next) => {
@@ -43,8 +43,16 @@ app.use(
   }),
 );
 
-app.post("/github-webhook", (req, res) => {
+//app.post("/github-webhook", (req, res) => {
+//  const givenSignature = req.headers["x-hub-signature-256"];
+
+app.post("/github-webhook",
+  express.raw({ type: "application/json" }),
+(req, res) => {
+  console.log(req.headers)
   const givenSignature = req.headers["x-hub-signature-256"];
+
+console.log(givenSignature);
 
   if (!givenSignature) {
     return res.status(403).json({ error: "Invalid Signature" });
@@ -53,22 +61,45 @@ app.post("/github-webhook", (req, res) => {
   const calculatedSignature =
     "sha256=" +
     crypto
-      .createHmac("sha256", "dushyan")
+      .createHmac("sha256", process.env.GITHUB_SECRET)
       .update(req.body)
       // .update(JSON.stringify(payload))
       .digest("hex");
   // crypto.timingSafeEqual;
+
+console.log(calculatedSignature);
+
+
   if (givenSignature !== calculatedSignature) {
     return res.status(403).json({ error: "Invalid Signature" });
+
   }
+
+const payload = JSON.parse(req.body.toString());
+console.log("🔥 REPOSITORY:", payload.repository?.full_name);
+console.log("🔥 BRANCH:", payload.ref);
+
+
   console.log(calculatedSignature);
 
   console.log("");
   console.log("REQUEST HEADERS:", req.headers);
   console.log("REQUEST BODY:", req.body);
   res.json({ message: "OK" });
-  const bashChildProcess = spawn("bash", ["/home/ubuntu/depolye-fronted.sh"]);
+    let repository;
 
+  if (req.body.repository.name === "storageApp-fronted") {
+    repository = "fronted";
+  } else {
+    repository = "backend";
+  }
+  console.log({ repository });
+  const bashChildProcess = spawn("bash", [
+    `/home/ubuntu/depolye-${repository}.sh`,
+  ]);
+  // const bashChildProcess = spawn("bash", ["/home/ubuntu/depolye-fronted.sh"]);
+
+    console.log("🔥 deploye-fronted.sh spawned");
   // bashChildProcess.stdout.pipe(process.stdout);
   // bashChildProcess.stdout.pipe(process.stdout);
 
@@ -119,3 +150,8 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server Started`);
 });
+
+
+
+
+
