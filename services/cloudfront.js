@@ -1,7 +1,7 @@
 import { getSignedUrl } from "@aws-sdk/cloudfront-signer";
 import { readFileSync } from "fs";
 
-const privateKey = readFileSync(
+const privateKey =   readFileSync(
   "/home/ubuntu/StorageApp_backend/cloudfront-private-key.pem",
   "utf8",
 );

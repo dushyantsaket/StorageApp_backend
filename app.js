@@ -44,7 +44,7 @@ app.use(
 );
 
 app.post("/github-webhook", (req, res) => {
-  const givenSignature = req.headers["X-Hub-Signature-256"];
+  const givenSignature = req.headers["x-hub-signature-256"];
 
   if (!givenSignature) {
     return res.status(403).json({ error: "Invalid Signature" });
@@ -54,9 +54,10 @@ app.post("/github-webhook", (req, res) => {
     "sha256=" +
     crypto
       .createHmac("sha256", "dushyan")
-      .update(JSON.stringify(payload))
+      .update(req.body)
+      // .update(JSON.stringify(payload))
       .digest("hex");
-  crypto.timingSafeEqual;
+  // crypto.timingSafeEqual;
   if (givenSignature !== calculatedSignature) {
     return res.status(403).json({ error: "Invalid Signature" });
   }
@@ -81,7 +82,6 @@ app.post("/github-webhook", (req, res) => {
   });
 
   bashChildProcess.on("close", (code) => {
-    res.json({ message: "OK" });
     if (code === 0) {
       console.log("script executed  successfully");
     } else {

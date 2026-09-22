@@ -1,20 +1,28 @@
 import crypto from "crypto";
 
-export const verifyGithubSignature = (secret, signature) => {
-  const realsignature = replace(sha256);
+export const verifyGithubSignature = (secret, signature, rawBody) => {
+  const realSignature = signature;
 
   if (!signature) {
-    cosnole.log(" githu  signature iis messing ");
+    console.log("github signature is missing");
     return false;
   }
-  const expectedSignature = signature
-    .replace("sha256")
-    .updated(rawBody)
-    .digest(hex);
-  console.log({ realsignature, expectedSignature });
 
-  if (realsignature !== expectedSignature) {
-    toString.match = signaturelenght;
+  const expectedSignature =
+    "sha256=" +
+    crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
+
+  console.log({
+    realSignature,
+    expectedSignature,
+  });
+
+  if (realSignature !== expectedSignature) {
+    console.log("github signature is not verified");
+    return false;
   }
+
+  console.log("github signature is verified");
+
   return true;
 };
