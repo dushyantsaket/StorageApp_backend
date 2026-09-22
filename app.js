@@ -128,7 +128,7 @@ console.log("🔥 BRANCH:", payload.ref);
 });
 
 app.get("/", (req, res) => {
-  res.json({ message: "hello from StorageApp" });
+  res.json({ message: "hello from My StorageApp" });
 });
 
 app.get("/err", (req, res) => {
