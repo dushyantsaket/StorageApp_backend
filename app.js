@@ -11,10 +11,28 @@ import checkAuth from "./middlewares/authMiddleware.js";
 import { connectDB } from "./config/db.js";
 import { spawn } from "child_process";
 import crypto from "node:crypto";
+import { Resend } from "resend";
+
 await connectDB();
 
 const PORT = process.env.PORT || 4000;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
+async function sendEmail(message) {
+  const { data, error } = await resend.emails.send({
+    from: "Storage App <deploy@vpttoolsindia.store>",
+    to: "dushyantsaket20@gmail.com",
+    subject: "Deployment Status",
+    text: message,
+  });
+
+  if (error) {
+    console.log("Email failed:", error);
+    return;
+  }
+
+  console.log("Email sent:", data);
+}
 const app = express();
 app.use(cookieParser(process.env.SESSION_SECRET));
 // Razorpay's signature is calculated from the exact request bytes, so this
@@ -74,8 +92,8 @@ app.post(
     }
 
     const payload = JSON.parse(req.body.toString());
-    console.log("🔥 REPOSITORY:", payload.repository?.full_name);
-    console.log("🔥 BRANCH:", payload.ref);
+    console.log("REPOSITORY:", payload.repository?.full_name);
+    console.log(" BRANCH:", payload.ref);
 
     console.log(calculatedSignature);
 
@@ -96,10 +114,18 @@ app.post(
     ]);
     // const bashChildProcess = spawn("bash", ["/home/ubuntu/depolye-fronted.sh"]);
 
-    console.log(`🔥 depolye-${repository}.sh spawned`);
+    console.log(` depolye-${repository}.sh spawned`);
     // bashChildProcess.stdout.pipe(process.stdout);
     // bashChildProcess.stdout.pipe(process.stdout);
-
+    bashChildProcess.on("close", async (code) => {
+      const status = (code = 0 ? "pass" : "failed");
+      if (status === "failed") {
+        await sendEmail(" your  code deployment has  failed ");
+      }
+      if (status === "passed") {
+        await sendEmail(" your  code  deployemnt  passed ");
+      }
+    });
     bashChildProcess.stdout.on("data", (data) => {
       // console.log("got stander out data ");
       process.stdout.write(data);
