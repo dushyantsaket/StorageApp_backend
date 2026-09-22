@@ -1,4 +1,4 @@
-  GNU nano 8.7.1                                                                                                                                                                                                  app.js
+app.js;
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -46,86 +46,85 @@ app.use(
 //app.post("/github-webhook", (req, res) => {
 //  const givenSignature = req.headers["x-hub-signature-256"];
 
-app.post("/github-webhook",
+app.post(
+  "/github-webhook",
   express.raw({ type: "application/json" }),
-(req, res) => {
-  console.log(req.headers)
-  const givenSignature = req.headers["x-hub-signature-256"];
+  (req, res) => {
+    console.log(req.headers);
+    const givenSignature = req.headers["x-hub-signature-256"];
 
-console.log(givenSignature);
+    console.log(givenSignature);
 
-  if (!givenSignature) {
-    return res.status(403).json({ error: "Invalid Signature" });
-  }
+    if (!givenSignature) {
+      return res.status(403).json({ error: "Invalid Signature" });
+    }
 
-  const calculatedSignature =
-    "sha256=" +
-    crypto
-      .createHmac("sha256", process.env.GITHUB_SECRET)
-      .update(req.body)
-      // .update(JSON.stringify(payload))
-      .digest("hex");
-  // crypto.timingSafeEqual;
+    const calculatedSignature =
+      "sha256=" +
+      crypto
+        .createHmac("sha256", process.env.GITHUB_SECRET)
+        .update(req.body)
+        // .update(JSON.stringify(payload))
+        .digest("hex");
+    // crypto.timingSafeEqual;
 
-console.log(calculatedSignature);
+    console.log(calculatedSignature);
 
+    if (givenSignature !== calculatedSignature) {
+      return res.status(403).json({ error: "Invalid Signature" });
+    }
 
-  if (givenSignature !== calculatedSignature) {
-    return res.status(403).json({ error: "Invalid Signature" });
+    const payload = JSON.parse(req.body.toString());
+    console.log("🔥 REPOSITORY:", payload.repository?.full_name);
+    console.log("🔥 BRANCH:", payload.ref);
 
-  }
+    console.log(calculatedSignature);
 
-const payload = JSON.parse(req.body.toString());
-console.log("🔥 REPOSITORY:", payload.repository?.full_name);
-console.log("🔥 BRANCH:", payload.ref);
-
-
-  console.log(calculatedSignature);
-
-  console.log("");
-  console.log("REQUEST HEADERS:", req.headers);
-  console.log("REQUEST BODY:", req.body);
-  res.json({ message: "OK" });
+    console.log("");
+    console.log("REQUEST HEADERS:", req.headers);
+    console.log("REQUEST BODY:", req.body);
+    res.json({ message: "OK" });
     let repository;
 
-  if (req.body.repository.name === "storageApp-fronted") {
-    repository = "fronted";
-  } else {
-    repository = "backend";
-  }
-  console.log({ repository });
-  const bashChildProcess = spawn("bash", [
-    `/home/ubuntu/depolye-${repository}.sh`,
-  ]);
-  // const bashChildProcess = spawn("bash", ["/home/ubuntu/depolye-fronted.sh"]);
+    if (req.body.repository.name === "storageApp-fronted") {
+      repository = "fronted";
+    } else {
+      repository = "backend";
+    }
+    console.log({ repository });
+    const bashChildProcess = spawn("bash", [
+      `/home/ubuntu/depolye-${repository}.sh`,
+    ]);
+    // const bashChildProcess = spawn("bash", ["/home/ubuntu/depolye-fronted.sh"]);
 
     console.log("🔥 deploye-fronted.sh spawned");
-  // bashChildProcess.stdout.pipe(process.stdout);
-  // bashChildProcess.stdout.pipe(process.stdout);
+    // bashChildProcess.stdout.pipe(process.stdout);
+    // bashChildProcess.stdout.pipe(process.stdout);
 
-  bashChildProcess.stdout.on("data", (data) => {
-    // console.log("got stander out data ");
-    process.stdout.write(data);
-  });
+    bashChildProcess.stdout.on("data", (data) => {
+      // console.log("got stander out data ");
+      process.stdout.write(data);
+    });
 
-  bashChildProcess.stderr.on("data", (data) => {
-    process.stderr.write(data);
-  });
+    bashChildProcess.stderr.on("data", (data) => {
+      process.stderr.write(data);
+    });
 
-  bashChildProcess.on("close", (code) => {
-    if (code === 0) {
-      console.log("script executed  successfully");
-    } else {
-      console.log("script faild");
-    }
-  });
-  bashChildProcess.on("error", (err) => {
-    console.log("ERROR is  spawning the  process");
-    console.log(err);
-  });
-  // console.log(bashChildProcess.stdout);
-  // console.log(bashChildProcess.stderr);
-});
+    bashChildProcess.on("close", (code) => {
+      if (code === 0) {
+        console.log("script executed  successfully");
+      } else {
+        console.log("script faild");
+      }
+    });
+    bashChildProcess.on("error", (err) => {
+      console.log("ERROR is  spawning the  process");
+      console.log(err);
+    });
+    // console.log(bashChildProcess.stdout);
+    // console.log(bashChildProcess.stderr);
+  },
+);
 
 app.get("/", (req, res) => {
   res.json({ message: "hello from My StorageApp" });
@@ -150,8 +149,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server Started`);
 });
-
-
-
-
-
