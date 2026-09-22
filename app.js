@@ -127,7 +127,7 @@ app.post(
 );
 
 app.get("/", (req, res) => {
-  res.json({ message: "hello from My StorageApp" });
+  res.json({ message: "heeeloo from My StorageApp" });
 });
 
 app.get("/err", (req, res) => {
