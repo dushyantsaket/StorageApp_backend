@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -152,7 +153,7 @@ app.post(
 );
 
 app.get("/", (req, res) => {
-  res.json({ message: "hello from  StorageApp" });
+  res.json({ message: "hello im form storageApp" });
 });
 
 app.get("/err", (req, res) => {
