@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SSH: 44.219.36.207
+      SSH_HOST: 44.219.36.207
       SSH_USER: ubuntu
       REMOTE_APP_DIR: /home/ubuntu/StorageApp_backend
       PM2_APP_NAME: myApp
@@ -26,7 +26,7 @@ jobs:
           ssh-keyscan -H "$SSH_HOST" >> "$HOME/.ssh/known_hosts"
 
       - name: Deploye backend on EC2
-        run: ssh aws-server << 'bash -s' << 'EOF'
+        run: ssh -i "$HOME/.ssh/id_rsa" "$SSH_USER@$SSH_HOST" << 'EOF'
           set -e
 
           cd /home/ubuntu/StorageApp_backend
