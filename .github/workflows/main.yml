@@ -1,0 +1,49 @@
+name: Deployee StorageApp Backend
+on: [push, workflow_dispatch]
+
+jobs:
+  Deployee:
+    runs-on: ubuntu-latest
+
+    env:
+      SSH: 44.219.36.207
+      SSH_USER: ubuntu
+      REMOTE_APP_DIR: /home/ubuntu/StorageApp_backend
+      PM2_APP_NAME: storageApp
+
+    steps:
+      - name: Checkout the  repoestry
+        uses: actions/checkout@v4
+      - name: setup node js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+      - name: SETUP SSH
+        run: mkdir -p ~/.ssh
+          echo "{{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploye backend on EC2
+        run: ssh aws-server << 'bash -s' << 'EOF'
+          set -e
+
+          cd /home/ubuntu/StorageApp_backend
+          git pull
+          echo "🔥 Backend deployment started..."
+
+          git fe tch origin
+          git reset --hard origin/main
+
+          echo "✅ Code updated from GitHub"
+
+          echo "Installing client dependencies  (npm ci)......"
+          npm ci --no-audit --no-fund
+
+          echo "✅ Dependencies installed"
+
+          pm2 reload myApp
+
+          echo "🔥 Backend deployed successfully"
+          EOF
