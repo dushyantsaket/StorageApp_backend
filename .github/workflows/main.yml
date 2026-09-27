@@ -33,7 +33,7 @@ jobs:
           git pull
           echo "🔥 Backend deployment started..."
 
-          git fe tch origin
+          git fetch origin
           git reset --hard origin/main
 
           echo "✅ Code updated from GitHub"
